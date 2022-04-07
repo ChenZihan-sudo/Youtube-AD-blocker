@@ -154,3 +154,53 @@ function apdAry(ary) {
     ary.splice(ary.length, 0, []);
     return ary.length - 1;
 }
+
+function skipFixedAD() {
+    //open the feedback iframe
+    document.getElementsByClassName('ytp-ad-clickable')[0].click();
+    const observerInit = { childList: true, subtree: true };
+
+    //In the first time, wo should detect the iframe element.
+    //After the first time, the iframe element will always exist.
+    const iframeObserver = new MutationObserver(() => {
+        const iframe = document.getElementById('iframe');
+        if (iframe) {
+            iframeObserver.disconnect();
+
+            function iframeLoaded() {
+                iframe.removeEventListener('load', iframeLoaded, true);
+
+                //get feedback iframe document
+                const iframeDocument = iframe.contentWindow.document;
+                //click feedback button to open the confirm dialog (the element id or class are random, so we need XPath)
+                document.evaluate('/html/body/c-wiz/div/div/div[2]/div[2]/div/div[1]/div[1]/div/div[2]/div[2]/div/button', iframeDocument).iterateNext().click();
+
+                const iframeBody = document.evaluate('/html/body', iframeDocument).iterateNext();
+                const okBtnObserver = new MutationObserver(() => {
+                    //get ok button after dialog created
+                    const okBtn = document.evaluate('/html/body/div[2]/div/div[2]/span/div/div/div[2]/div[2]/button', iframeDocument).iterateNext();
+                    if (okBtn) {
+                        okBtnObserver.disconnect();
+                        okBtn.click();
+                        
+                        //There may be delay and we need to detect the ok tips.
+                        const okTipsObserver = new MutationObserver(() => {
+                            //If the feedback is done, it will change from 'none' to 'flex'.
+                            const finishedTipsDisplay = getComputedStyle(document.evaluate('/html/body/c-wiz/div/div/div[2]/div[1]', iframeDocument).iterateNext(), null).display;
+                            if (finishedTipsDisplay !== 'none') {
+                                okTipsObserver.disconnect();
+                                //Finished, close the iframe, the video will continue automatically.
+                                document.evaluate('/html/body/c-wiz/div/div/div[1]/div[2]/div/button', iframeDocument).iterateNext().click();
+                            }
+                        });
+                        okTipsObserver.observe(iframeBody, observerInit);
+                    }
+                });
+                okBtnObserver.observe(iframeBody, observerInit);
+            }
+            //listen for the iframe element load event
+            iframe.addEventListener('load', iframeLoaded, true);
+        }
+    });
+    iframeObserver.observe(document, observerInit);
+}
