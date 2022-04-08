@@ -182,18 +182,18 @@ function skipFixedAD() {
                     if (okBtn) {
                         okBtnObserver.disconnect();
                         okBtn.click();
-                        
+
                         //There may be delay and we need to detect the ok tips.
-                        const okTipsObserver = new MutationObserver(() => {
+                        //But ComputedStyle has not change event, MutationObserver can't do it.
+                        let okTipsTimer = setInterval(() => {
                             //If the feedback is done, it will change from 'none' to 'flex'.
                             const finishedTipsDisplay = getComputedStyle(document.evaluate('/html/body/c-wiz/div/div/div[2]/div[1]', iframeDocument).iterateNext(), null).display;
                             if (finishedTipsDisplay !== 'none') {
-                                okTipsObserver.disconnect();
+                                clearInterval(okTipsTimer);
                                 //Finished, close the iframe, the video will continue automatically.
                                 document.evaluate('/html/body/c-wiz/div/div/div[1]/div[2]/div/button', iframeDocument).iterateNext().click();
                             }
-                        });
-                        okTipsObserver.observe(iframeBody, observerInit);
+                        }, 50);
                     }
                 });
                 okBtnObserver.observe(iframeBody, observerInit);
