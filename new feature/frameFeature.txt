@@ -1,0 +1,16 @@
+//param:always
+
+//click to activate ad card
+//document.querySelector("#button\\:d > span").click()
+//document.getElementsByClassName("ytp-ad-button-icon")[0].click()
+
+//iframe(aboutthisad)
+//=>window.frames[2].document
+//window.frames[2].document.childNodes[1].childNodes[1].childNodes[2].childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0].click()
+
+//close ad card=>
+//length
+//[window.frames[2].document.childNodes[1].childNodes[1].childElementCount - 1]
+
+//close ad button=>
+//window.frames[2].document.childNodes[1].childNodes[1].childNodes[9].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].click()
